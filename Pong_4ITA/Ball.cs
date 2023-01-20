@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,7 +21,7 @@ namespace Pong_4ITA
             this.size = size;
             this.speed = speed;
             position = initialPosition;
-            direction = initialDirection;
+            direction = initialDirection.Normalize();
         }
 
         public void Draw(Graphics g) {
@@ -32,8 +33,28 @@ namespace Pong_4ITA
             position.Y += direction.Y * speed;
         }
 
-        public void ChangeDirection(PointF newDir) {
+        public void ChangeDirection() {
+            //direction = newDir.Normalize();
+            direction.X *= -1;
+        }
 
+        public void CheckCollisionsWithWall(int height) {
+            if(position.Y - size/2 <= 0) {
+                // změna úhlu, náraz na horní stěnu
+                direction.Y *= -1;
+
+            }
+
+            if(position.Y + size/2 >= height) {
+                // změna úhlu, náraz na spodní stěnu
+                direction.Y *= -1;
+            }
+        }
+
+        public Point GetCheckPoint(bool isLeft) {
+            return isLeft ? 
+                new Point((int)position.X - size/2, (int) position.Y) : 
+                new Point((int)position.X + size / 2, (int) position.Y);
         }
     }
 }

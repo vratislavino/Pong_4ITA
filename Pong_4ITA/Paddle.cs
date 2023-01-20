@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,35 +9,39 @@ namespace Pong_4ITA
 {
     internal class Paddle
     {
-        private int width;
-        private int height;
+        private Rectangle rect;
+
+        //private int width;
+        //private int height;
 
         private float speed;
         private Brush color;
 
-        private PointF position;
+        //private PointF position;
 
         private Keys upKey; 
         private Keys downKey;
 
-        private Keys? holdingKey;
+        private List<Keys> holdingKeys;
+        //private Keys? holdingKey;
 
         private int maxY;
+        private bool isLeft;
 
-        public Paddle(int height, float speed, Color color, PointF initialPosition, Keys up, Keys down, int maxY) {
-            width = 40;
-            this.height = height;
+        public Paddle(bool isLeft, int height, float speed, Color color, Point initialPosition, Keys up, Keys down, int maxY) {
+            this.isLeft = isLeft;
+            rect = new Rectangle(initialPosition.X, initialPosition.Y, 40, height);
             this.speed = speed;
             this.color = new SolidBrush(color);
-            position = initialPosition;
             this.maxY = maxY;
 
+            holdingKeys = new List<Keys>();
             this.upKey = up;
             this.downKey = down;
         }
 
         public void Draw(Graphics g) {
-            g.FillRectangle(color, position.X, position.Y, width, height);
+            g.FillRectangle(color, rect);
         }
 
         public bool IsKeyForThisPaddle(Keys k) {
@@ -44,8 +49,9 @@ namespace Pong_4ITA
         }
 
         public void Move() {
-            if(holdingKey.HasValue) {
-                if (holdingKey.Value == upKey) {
+            if(holdingKeys.Count > 0) {
+                var lastPressedKey = holdingKeys.Last();
+                if (lastPressedKey == upKey) {
                     TryToMove(-speed);
                 } else {
                     TryToMove(speed);
@@ -54,14 +60,24 @@ namespace Pong_4ITA
         }
 
         private void TryToMove(float change) {
-            var newY = position.Y + change;
-            if(newY > 0 && newY < maxY - height) {
-                position.Y = newY;
+            var newY = rect.Y + change;
+            if(newY > 0 && newY < maxY - rect.Height) {
+                rect.Y = (int)newY;
             }
         }
 
-        public void ChangeHoldingKey(Keys? holdingKey) {
-            this.holdingKey = holdingKey;
+        public void AddHoldingKey(Keys key) { 
+            if(!holdingKeys.Contains(key))
+                holdingKeys.Add(key);
+        }
+
+        public void RemoveHoldingKey(Keys key) {
+            if(holdingKeys.Contains(key))
+                holdingKeys.Remove(key);
+        }
+
+        public bool CollidesWithBall(Ball ball) {
+            return rect.Contains(ball.GetCheckPoint(isLeft));
         }
 
     }

@@ -23,29 +23,42 @@ namespace Pong_4ITA
         }
 
         private void Canvas_Load(object sender, EventArgs e) {
-            ball = new Ball(40, 10f, new PointF(Width / 2, Height / 2), new PointF(1,0));
+            ball = new Ball(40, 10f, new PointF(Width / 2, Height / 2), GetRandomVector());
             
             player1 = new Paddle(
+                true,
                 initPaddleSize, 
                 6f, 
                 Color.Blue, 
-                new PointF(40, Height/2 - initPaddleSize/2), 
+                new Point(40, Height/2 - initPaddleSize/2), 
                 Keys.W,
                 Keys.S,
                 Height
                 );
 
             player2 = new Paddle(
+                false,
                 initPaddleSize,
                 6f,
                 Color.Red,
-                new PointF(Width-40-40, Height / 2 - initPaddleSize / 2),
+                new Point(Width-40-40, Height / 2 - initPaddleSize / 2),
                 Keys.O,
                 Keys.L,
                 Height
                 );
 
             gameTimer.Start();
+        }
+
+        private PointF GetRandomVector() {
+            Random r = new Random();
+            int yMove = r.Next(-3, 3);
+            //yMove = -40;
+            if (r.Next(2) == 0) {
+                return new PointF(-5, yMove);
+            } else {
+                return new PointF(5, yMove);
+            }
         }
 
         private void Canvas_Paint(object sender, PaintEventArgs e) {
@@ -59,24 +72,36 @@ namespace Pong_4ITA
             player1.Move();
             player2.Move();
             ball.Move();
+
+            ball.CheckCollisionsWithWall(Height);
+            if(player1.CollidesWithBall(ball)) {
+                ball.ChangeDirection();
+            }
+            if (player2.CollidesWithBall(ball)) {
+                ball.ChangeDirection();
+            }
+
+
             Refresh();
         }
 
+
+
         private void Canvas_KeyDown(object sender, KeyEventArgs e) {
             if(player1.IsKeyForThisPaddle(e.KeyCode)) {
-                player1.ChangeHoldingKey(e.KeyCode);
+                player1.AddHoldingKey(e.KeyCode);
             }
             if (player2.IsKeyForThisPaddle(e.KeyCode)) {
-                player2.ChangeHoldingKey(e.KeyCode);
+                player2.AddHoldingKey(e.KeyCode);
             }
         }
 
         private void Canvas_KeyUp(object sender, KeyEventArgs e) {
             if (player1.IsKeyForThisPaddle(e.KeyCode)) {
-                player1.ChangeHoldingKey(null);
+                player1.RemoveHoldingKey(e.KeyCode);
             }
             if (player2.IsKeyForThisPaddle(e.KeyCode)) {
-                player2.ChangeHoldingKey(null);
+                player2.RemoveHoldingKey(e.KeyCode);
             }
         }
     }
