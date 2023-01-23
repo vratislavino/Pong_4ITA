@@ -12,6 +12,7 @@ namespace Pong_4ITA
         private int size;
         private Brush color;
         float speed;
+        public float Speed { set { speed = value; } }
 
         PointF position;
         PointF direction; // normalized direction
@@ -37,7 +38,7 @@ namespace Pong_4ITA
             //direction = newDir.Normalize();
             direction.X *= -1;
         }
-
+        
         public void CheckCollisionsWithWall(int height) {
             if(position.Y - size/2 <= 0) {
                 // změna úhlu, náraz na horní stěnu
@@ -55,6 +56,14 @@ namespace Pong_4ITA
             return isLeft ? 
                 new Point((int)position.X - size/2, (int) position.Y) : 
                 new Point((int)position.X + size / 2, (int) position.Y);
+        }
+
+        internal bool? CheckLosing(int width) {
+            var checkPoint = GetCheckPoint(position.X < width / 2);
+
+            if (checkPoint.X < 0) return true; 
+            if (checkPoint.X > width) return false;
+            return null;
         }
     }
 }

@@ -13,6 +13,8 @@ namespace Pong_4ITA
 
         //private int width;
         //private int height;
+        private int score;
+        public int Score => score;
 
         private float speed;
         private Brush color;
@@ -29,6 +31,7 @@ namespace Pong_4ITA
         private bool isLeft;
 
         public Paddle(bool isLeft, int height, float speed, Color color, Point initialPosition, Keys up, Keys down, int maxY) {
+            score = 0;
             this.isLeft = isLeft;
             rect = new Rectangle(initialPosition.X, initialPosition.Y, 40, height);
             this.speed = speed;
@@ -38,6 +41,10 @@ namespace Pong_4ITA
             holdingKeys = new List<Keys>();
             this.upKey = up;
             this.downKey = down;
+        }
+
+        public void AddScore() {
+            score++;
         }
 
         public void Draw(Graphics g) {

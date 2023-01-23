@@ -17,13 +17,16 @@ namespace Pong_4ITA
         Paddle player2;
 
         int initPaddleSize = 200;
+        int ballSpeed;
+
+        public event Action<int, int> ScoreChanged;
 
         public Canvas() {
             InitializeComponent();
         }
 
         private void Canvas_Load(object sender, EventArgs e) {
-            ball = new Ball(40, 10f, new PointF(Width / 2, Height / 2), GetRandomVector());
+            ball = new Ball(40, ballSpeed, new PointF(Width / 2, Height / 2), GetRandomVector());
             
             player1 = new Paddle(
                 true,
@@ -48,6 +51,12 @@ namespace Pong_4ITA
                 );
 
             gameTimer.Start();
+        }
+
+        private void AddScore(Paddle losingPaddle) {
+            var winning = losingPaddle == player1 ? player2 : player1;
+            winning.AddScore();
+            ScoreChanged?.Invoke(player1.Score, player2.Score);
         }
 
         private PointF GetRandomVector() {
@@ -80,8 +89,18 @@ namespace Pong_4ITA
             if (player2.CollidesWithBall(ball)) {
                 ball.ChangeDirection();
             }
-
-
+            var losing = ball.CheckLosing(Width);
+            if (losing.HasValue) {
+                bool leftPaddleLostBall = losing.Value;
+                //gameTimer.Stop();
+                //MessageBox.Show(leftPaddleLostBall + "");
+                
+                if (leftPaddleLostBall) { 
+                    AddScore(player1);
+                } else {
+                    AddScore(player2);
+                }
+            }
             Refresh();
         }
 
@@ -103,6 +122,10 @@ namespace Pong_4ITA
             if (player2.IsKeyForThisPaddle(e.KeyCode)) {
                 player2.RemoveHoldingKey(e.KeyCode);
             }
+        }
+
+        internal void SetBallSpeed(int ballSpeed) {
+            this.ballSpeed = ballSpeed;
         }
     }
 }
