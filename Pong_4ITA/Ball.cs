@@ -25,6 +25,11 @@ namespace Pong_4ITA
             direction = initialDirection.Normalize();
         }
 
+        public void Reset(PointF initialPosition, PointF initialDirection) {
+            position = initialPosition;
+            direction = initialDirection.Normalize();
+        }
+
         public void Draw(Graphics g) {
             g.FillEllipse(color, position.X - size / 2, position.Y - size / 2, size, size);
         }
@@ -34,9 +39,13 @@ namespace Pong_4ITA
             position.Y += direction.Y * speed;
         }
 
-        public void ChangeDirection() {
-            //direction = newDir.Normalize();
-            direction.X *= -1;
+        public void ChangeDirection(Paddle player) {
+            float y = position.Y - player.Rect.Y;
+            float angle = y.Remap(0, 200, -45, 45);
+            angle = angle.ConvertDegreesToRadians();
+
+            direction = new PointF((player.IsLeft ? 1 : -1) * (float) Math.Cos(angle), (float) Math.Sin(angle));
+
         }
         
         public void CheckCollisionsWithWall(int height) {

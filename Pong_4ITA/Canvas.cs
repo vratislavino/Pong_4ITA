@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -21,8 +22,14 @@ namespace Pong_4ITA
 
         public event Action<int, int> ScoreChanged;
 
+        bool gameStarted = false;
+
         public Canvas() {
             InitializeComponent();
+        }
+
+        public void StopGame() {
+            gameTimer.Stop();
         }
 
         private void Canvas_Load(object sender, EventArgs e) {
@@ -31,7 +38,7 @@ namespace Pong_4ITA
             player1 = new Paddle(
                 true,
                 initPaddleSize, 
-                6f, 
+                16f, 
                 Color.Blue, 
                 new Point(40, Height/2 - initPaddleSize/2), 
                 Keys.W,
@@ -42,7 +49,7 @@ namespace Pong_4ITA
             player2 = new Paddle(
                 false,
                 initPaddleSize,
-                6f,
+                16f,
                 Color.Red,
                 new Point(Width-40-40, Height / 2 - initPaddleSize / 2),
                 Keys.O,
@@ -50,7 +57,7 @@ namespace Pong_4ITA
                 Height
                 );
 
-            gameTimer.Start();
+            //gameTimer.Start();
         }
 
         private void AddScore(Paddle losingPaddle) {
@@ -84,10 +91,10 @@ namespace Pong_4ITA
 
             ball.CheckCollisionsWithWall(Height);
             if(player1.CollidesWithBall(ball)) {
-                ball.ChangeDirection();
+                ball.ChangeDirection(player1);
             }
             if (player2.CollidesWithBall(ball)) {
-                ball.ChangeDirection();
+                ball.ChangeDirection(player2);
             }
             var losing = ball.CheckLosing(Width);
             if (losing.HasValue) {
@@ -100,6 +107,9 @@ namespace Pong_4ITA
                 } else {
                     AddScore(player2);
                 }
+                ball.Reset(new PointF(Width / 2, Height / 2), GetRandomVector());
+                gameTimer.Stop();
+                gameStarted = false;
             }
             Refresh();
         }
@@ -107,6 +117,15 @@ namespace Pong_4ITA
 
 
         private void Canvas_KeyDown(object sender, KeyEventArgs e) {
+
+            if(e.KeyCode == Keys.Space) {
+                gameTimer.Start();
+                gameStarted = true;
+            }
+
+            if (!gameStarted)
+                return;
+
             if(player1.IsKeyForThisPaddle(e.KeyCode)) {
                 player1.AddHoldingKey(e.KeyCode);
             }

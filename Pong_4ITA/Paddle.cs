@@ -10,6 +10,7 @@ namespace Pong_4ITA
     internal class Paddle
     {
         private Rectangle rect;
+        public Rectangle Rect => rect; 
 
         //private int width;
         //private int height;
@@ -29,6 +30,7 @@ namespace Pong_4ITA
 
         private int maxY;
         private bool isLeft;
+        public bool IsLeft => isLeft;
 
         public Paddle(bool isLeft, int height, float speed, Color color, Point initialPosition, Keys up, Keys down, int maxY) {
             score = 0;

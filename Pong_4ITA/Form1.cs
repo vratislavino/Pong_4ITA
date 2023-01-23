@@ -15,6 +15,16 @@ namespace Pong_4ITA
 
         private void OnScoreChanged(int score1, int score2) {
             label3.Text = $"{score1}:{score2}";
+            if(score1 == 3) {
+                canvas1.StopGame();
+                MessageBox.Show("Vyhr·l hr·Ë 1: " + label1.Text);
+                this.Close();
+            }
+            if (score2 == 3) {
+                canvas1.StopGame();
+                MessageBox.Show("Vyhr·l hr·Ë 2: " + label2.Text);
+                this.Close();
+            }
         }
     }
 }
